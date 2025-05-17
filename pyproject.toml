@@ -1,0 +1,8 @@
+[tool.pytest.ini_options]
+addopts = [
+    "--cov=app --cov-report=html"
+]
+pythonpath = [
+    "app"
+]
+testpaths = ["tests"]
