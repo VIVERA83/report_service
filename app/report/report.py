@@ -19,6 +19,17 @@ class Report:
     ) -> dict[str, Any]:
         report = self.reports[report]
         report.load_records(*files)
+        if columns is None:
+            columns = {key: key for key in report.dc.__annotations__.keys()}
+        if group:
+            columns = {
+                group: group, **columns,
+            }
+        if subtotal_columns:
+            for column in subtotal_columns:
+                if not columns.get(column):
+                    columns[column] = column
+
         return report.get_report(
             columns,
             subtotal_columns,

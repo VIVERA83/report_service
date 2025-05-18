@@ -6,7 +6,9 @@ from app.core.config import ReportEnum
 
 
 def resolve_aliases(aliases=None):
-    """Декоратор для замены алиасов в аргументах класса"""
+    """Декоратор для замены алиасов в аргументах класса.
+
+    """
     if aliases is None:
         aliases = {}  # Значение по умолчанию
 

@@ -1,6 +1,6 @@
 [tool.pytest.ini_options]
 addopts = [
-    "--cov=app --cov-report=html"
+    "--cov=app --cov-report=term"
 ]
 pythonpath = [
     "app"

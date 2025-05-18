@@ -1,20 +1,24 @@
 from collections import defaultdict
 
+from icecream import ic
+
 from app.report.base import BaseReport
 
 
 class Payout(BaseReport):
 
     def get_report(
-        self,
-        columns: dict[str, str] = None,
-        subtotal_columns: list[str] = None,
-        group: str = None,
+            self,
+            columns: dict[str, str] = None,
+            subtotal_columns: list[str] = None,
+            group: str = None,
     ) -> dict:
-        if columns:
-            self._update_column_widths(columns)
-        else:
-            columns = {}
+        if columns is None:
+            columns = {key : key for key in self.dc.__annotations__.keys()}
+        if group:
+            columns = {group: group, **columns}
+
+        self._update_column_widths(columns)
         self.subtotal_columns = subtotal_columns if subtotal_columns else []
         self.group = group if group is not None else ""
         self.sort_records(*columns.keys())
@@ -55,8 +59,8 @@ class Payout(BaseReport):
         return {field: field for field in self._records[0].__annotations__.keys()}
 
     def _show_report(
-        self,
-        columns: dict[str, str] = None,
+            self,
+            columns: dict[str, str] = None,
     ) -> None:
 
         result: list[str] = [self._get_title_report(columns)]
@@ -86,7 +90,7 @@ class Payout(BaseReport):
         return print(*result, sep="\n")
 
     def __get_update_main_line(
-        self, record: dict[str, int | str], column: dict[str, str]
+            self, record: dict[str, int | str], column: dict[str, str]
     ) -> str:
         line = " " * self.indent
         for key, value in record.items():

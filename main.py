@@ -12,9 +12,9 @@ def main():
         columns={
             "department": " ",
             "name": "name",
-            "hours_worked": "hours",
-            "hourly_rate": "rate",
-            "payout": "payout",
+            # "hours_worked": "hours",
+            # "hourly_rate": "rate",
+            # "payout": "payout",
         },
         subtotal_columns=["hours_worked", "payout"],
         group="department",
