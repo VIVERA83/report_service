@@ -1,5 +1,3 @@
-from icecream import ic
-
 from app.models.utils import is_float_number
 
 
@@ -16,7 +14,7 @@ class BaseRecord(dict):
             try:
                 default += float(self[field])
             except ValueError as e:
-                ic(field, e)
+                print(field, e)
         if is_float_number(default):
             return default
         return int(default)
@@ -26,7 +24,7 @@ class BaseRecord(dict):
             try:
                 default *= float(self[field])
             except ValueError as e:
-                ic(field, e)
+                print(field, e)
 
         if is_float_number(default):
             return default
