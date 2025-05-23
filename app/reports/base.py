@@ -1,6 +1,7 @@
 from collections import defaultdict
-from typing import List, Type
+from typing import Type
 
+from app.models.base import BaseRecord
 from app.models.utils import custom_sort
 from app.reports.types import BaseRecordT
 from app.reports.utils import file_parse
@@ -17,9 +18,12 @@ class BaseReport:
         group: Поле для группировки данных
     """
 
-    def __init__(self, model: Type[BaseRecordT]) -> None:
-        self.model = model
-        self._records: List[BaseRecordT] = []
+    class Meta:
+        model: Type[BaseRecord] = BaseRecord
+
+    def __init__(self) -> None:
+        self.model = self.Meta.model
+        self._records: list[BaseRecord] = []
 
         self._max_lens: dict[str, int] = defaultdict(int)
         self.indent = 3
@@ -55,7 +59,7 @@ class JsonReport(BaseReport):
             if group is not None
             else self.sort_records(*fields)
         )
-        fields = fields or self.get_model_fields()  # if fields else self._records[0].fields()
+        fields = fields or self.get_model_fields()
         result = defaultdict(dict)
         for report in self._records:
             if data := {key: value for key, value in report.items() if key in fields}:
@@ -72,8 +76,8 @@ class JsonReport(BaseReport):
 
 class ShowReport(BaseReport):
 
-    def __init__(self, model: Type[BaseRecordT]) -> None:
-        super().__init__(model)
+    def __init__(self) -> None:
+        super().__init__()
         self._title: dict[str, str] = defaultdict(str)
         self._subtotal_columns = []
         self._current_group = ""
@@ -82,18 +86,23 @@ class ShowReport(BaseReport):
         self._result: list[str] = []
 
     def set_title_report(self, **fields) -> None:
+        """
+
+        Args:
+            **fields (object):
+        """
         if not self._title:
             self._title = self.get_model_fields()
 
         for key, value in fields.items():
             if key in self._title:
                 self._title[key] = str(value)
-                self._max_lens[key] = max(len(value), self._max_lens[key])
+                self._max_lens[key] = max(len(str(value)), self._max_lens[key])
             else:
                 print(f"Указанная колонка `{key}` не найдена.")
 
     def show_report(
-            self, *fields: str, group: str = None, subtotal_columns: dict[str, str] = None
+            self, *fields: str, group: str = None, subtotal_columns: list[str] = None
     ) -> None:
         self.__clear(*fields, group=group, subtotal_columns=subtotal_columns)
 

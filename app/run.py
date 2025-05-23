@@ -5,10 +5,12 @@ from models.models import Record
 
 
 class MyReport(ShowReport, JsonReport):
-    ...
+    class Meta:
+        model = Record
+
 
 if __name__ == "__main__":
-    report = MyReport(Record)
+    report = MyReport()
     files = [
         "../data/data1.csv",
         "../data/data2.csv",
@@ -26,7 +28,7 @@ if __name__ == "__main__":
         department=" ",
         hours_worked="Всего часов",
     )
-    ic(report.create_json_report())
+    ic(report.create_json_report(group="department"))
     ic(
         report.show_report(
             "id",
