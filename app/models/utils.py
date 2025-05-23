@@ -1,14 +1,10 @@
-from abc import ABC
-from dataclasses import asdict, dataclass
 from functools import wraps
-
-from app.core.config import ReportEnum
+from typing import Callable, Any
 
 
 def resolve_aliases(aliases=None):
-    """Декоратор для замены алиасов в аргументах класса.
+    """Декоратор для замены алиасов в аргументах класса."""
 
-    """
     if aliases is None:
         aliases = {}  # Значение по умолчанию
 
@@ -23,7 +19,6 @@ def resolve_aliases(aliases=None):
                 for alias in alias_list:
                     if alias in resolved_kwargs:
                         resolved_kwargs[field] = resolved_kwargs.pop(alias)
-
             # Вызываем оригинальный конструктор
             orig_init(self, *args, **resolved_kwargs)
 
@@ -33,18 +28,18 @@ def resolve_aliases(aliases=None):
     return decorator
 
 
-@dataclass
-class BaseRecord(ABC):
+def custom_sort(*fields: str) -> Callable[[tuple[str, Any]], int]:
+    """Генерирует функцию для кастомный сортировки."""
 
-    def __init__(self, *_, **__) -> None: ...
+    def inner(key) -> int:
+        try:
+            return fields.index(key)
+        except ValueError:
+            return len(fields)
 
-    def as_dict(self, *fields: str | None) -> dict:
-        if not fields:
-            return asdict(self)
-        return {key: value for key, value in asdict(self).items() if key in fields}
+    return lambda el: inner(el[0])
 
 
-@dataclass
-class Namespace:
-    files: list[str]
-    report: ReportEnum
+def is_float_number(number: int | float) -> bool:
+    integer = int(number)
+    return (integer / 2) * 2 != number
