@@ -84,6 +84,7 @@ class ShowReport(BaseReport):
         self._subtotal: dict[str, dict[str, int]] = defaultdict(dict)
         self._is_new_group = True
         self._result: list[str] = []
+        self._symbol = defaultdict(str)
 
     def set_title_report(self, **fields) -> None:
         """
@@ -104,14 +105,13 @@ class ShowReport(BaseReport):
     def show_report(
             self, *fields: str, group: str = None, subtotal_columns: list[str] = None
     ) -> None:
+        self.sort_records(group, *fields)
         self.__clear(*fields, group=group, subtotal_columns=subtotal_columns)
-
         for record in self._records:
             main_line = self.__get_update_main_line(record, *fields)
             group_line = self.__get_update_group_line(record)
             sub_line = self.__get_update_sub_line(*fields)
             self.__update_subtotal(record)
-
             if sub_line:
                 self._result.append(sub_line)
             if group_line:
@@ -136,11 +136,17 @@ class ShowReport(BaseReport):
     def __update_column_widths(self) -> None:
         """Обновляет максимальные длины значений для колонок."""
         for field in self.get_model_fields():
-            self._max_lens[field] = max(self._max_lens[field], len(str(field)))
+            self._max_lens[field] = max(
+                self._max_lens[field],
+                len(self._title.get(field,"")) or len(str(field)),
+            )
 
         for record in self._records:
             for key, value in record.items():
-                self._max_lens[key] = max(self._max_lens[key], len(str(value)))
+                self._max_lens[key] = max(
+                    self._max_lens[key],
+                    len(str(value)) + len(self._symbol.get("key",""))
+                )
 
     def __get_update_main_line(self, record: BaseRecordT, *fields: str) -> str:
         line = " " * self.indent
@@ -148,7 +154,8 @@ class ShowReport(BaseReport):
             if self._title[field] == " ":
                 line += "_" * self._max_lens[field]
             else:
-                line += str(record[field]).ljust(self._max_lens[field])
+                _sym_ = self._symbol.get(field, "")
+                line += _sym_ + str(record[field]).ljust(self._max_lens[field])
             line += " " * self.indent
         return line
 
@@ -168,7 +175,8 @@ class ShowReport(BaseReport):
 
             for key in fields or self._title.keys():
                 if key in self._subtotal_columns:
-                    line += str(sub_total[key]).ljust(self._max_lens[key])
+                    _sym_ = self._symbol.get(key, "")
+                    line += _sym_ + str(sub_total[key]).ljust(self._max_lens[key])
                 else:
                     line += " " * self._max_lens[key]
                 line += " " * self.indent
@@ -191,3 +199,7 @@ class ShowReport(BaseReport):
         self._subtotal = defaultdict(dict)
         self._subtotal_columns = subtotal_columns or []
         self._result = [self.__get_title(*fields)]
+
+    def set_symbol(self, **symbol: str) -> None:
+        for key, value in symbol.items():
+            self._symbol[key] = value

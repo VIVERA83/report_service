@@ -6,6 +6,10 @@ from app.models.utils import is_float_number
 class BaseRecord(dict):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        self.post_init()
+
+    def post_init(self):
+        ...
 
     def sum(self, *fields: str, default: int = 0) -> int | float:
         for field in fields:
