@@ -1,16 +1,21 @@
 from icecream import ic
 
-from app.reports.base import BaseReport, ShowReport
+from app.reports.base import ShowReport, JsonReport
 from models.models import Record
 
+
+class MyReport(ShowReport, JsonReport):
+    ...
+
 if __name__ == "__main__":
+    report = MyReport(Record)
     files = [
-        "data/data1.csv",
-        "data/data2.csv",
+        "../data/data1.csv",
+        "../data/data2.csv",
         # "data/data_new.csv"
     ]
     # files = ["data/data1.csv"]
-    report = ShowReport(Record)
+    # report = ShowReport(Record)
     report.load_from_files(*files)
     # print(*report._records, sep="\n")
     # report.sort_records("hours_worked", "name")
@@ -21,6 +26,7 @@ if __name__ == "__main__":
         department=" ",
         hours_worked="Всего часов",
     )
+    ic(report.create_json_report())
     ic(
         report.show_report(
             "id",

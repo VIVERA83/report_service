@@ -40,6 +40,12 @@ class BaseReport:
             reverse=reverse,
         )
 
+    def get_model_fields(self) -> dict[str, str]:
+        if self._records:
+            return {field: field for field in self._records[0].keys()}
+        else:
+            return {}
+
 
 class JsonReport(BaseReport):
 
@@ -49,7 +55,7 @@ class JsonReport(BaseReport):
             if group is not None
             else self.sort_records(*fields)
         )
-        fields = fields if fields else self._records[0].fields()
+        fields = fields or self.get_model_fields()  # if fields else self._records[0].fields()
         result = defaultdict(dict)
         for report in self._records:
             if data := {key: value for key, value in report.items() if key in fields}:
@@ -77,7 +83,7 @@ class ShowReport(BaseReport):
 
     def set_title_report(self, **fields) -> None:
         if not self._title:
-            self._title = self.__get_model_fields()
+            self._title = self.get_model_fields()
 
         for key, value in fields.items():
             if key in self._title:
@@ -87,7 +93,7 @@ class ShowReport(BaseReport):
                 print(f"Указанная колонка `{key}` не найдена.")
 
     def show_report(
-        self, *fields: str, group: str = None, subtotal_columns: dict[str, str] = None
+            self, *fields: str, group: str = None, subtotal_columns: dict[str, str] = None
     ) -> None:
         self.__clear(*fields, group=group, subtotal_columns=subtotal_columns)
 
@@ -110,7 +116,7 @@ class ShowReport(BaseReport):
 
     def __get_title(self, *fields: str) -> str:
         if not len(self._title):
-            self._title = self.__get_model_fields()
+            self._title = self.get_model_fields()
 
         title = ""
         for field in fields or self._title.keys():
@@ -120,18 +126,12 @@ class ShowReport(BaseReport):
 
     def __update_column_widths(self) -> None:
         """Обновляет максимальные длины значений для колонок."""
-        for field in self.__get_model_fields():
+        for field in self.get_model_fields():
             self._max_lens[field] = max(self._max_lens[field], len(str(field)))
 
         for record in self._records:
             for key, value in record.items():
                 self._max_lens[key] = max(self._max_lens[key], len(str(value)))
-
-    def __get_model_fields(self) -> dict[str, str]:
-        if self._records:
-            return {field: field for field in self._records[0].keys()}
-        else:
-            return {}
 
     def __get_update_main_line(self, record: BaseRecordT, *fields: str) -> str:
         line = " " * self.indent
