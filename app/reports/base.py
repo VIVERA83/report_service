@@ -8,14 +8,21 @@ from app.reports.utils import file_parse
 
 
 class BaseReport:
-    """Базовый класс для генерации отчетов.
+    """
+    Базовый класс для генерации отчетов
 
     Attributes:
-        _records: Список загруженных записей
-        _max_lens: Максимальные длины значений для колонок
-        indent: Размер отступа для форматирования
-        _subtotal_columns: Колонки для подсчета промежуточных итогов
-        group: Поле для группировки данных
+        model (Type[BaseRecord]): Класс модели данных
+        _records (list[BaseRecord]): Загруженные записи
+        _max_lens (dict[str, int]): Максимальные длины значений колонок
+        indent (int): Размер отступа между колонками
+        _subtotal_columns (list): Колонки для промежуточных итогов
+        group (str): Поле для группировки данных
+
+    Методы:
+        load_from_files(): Загрузка данных из файлов
+        sort_records(): Сортировка записей
+        get_model_fields(): Получение полей модели
     """
 
     class Meta:
@@ -31,12 +38,27 @@ class BaseReport:
         self.group = ""
 
     def load_from_files(self, *files: str) -> None:
-        """Загружает записей из файлов."""
+        """
+        Загружает данные из файлов
+
+        Параметры:
+            files (str): Список путей к файлам
+
+        Пример:
+            >>> report = BaseReport()
+            >>> report.load_from_files("data.csv")
+        """
         for file in files:
             self._records.extend(file_parse(file, self.model))
 
     def sort_records(self, *fields: str, reverse=False) -> None:
-        """Сортирует записи по указанным полям."""
+        """
+        Сортирует записи по указанным полям
+
+        Параметры:
+            fields (str): Поля для сортировки
+            reverse (bool): Обратный порядок сортировки
+        """
         for record in self._records:
             record.sort(by="custom", key_func=custom_sort(*fields), reverse=reverse)
         self._records.sort(
@@ -45,6 +67,12 @@ class BaseReport:
         )
 
     def get_model_fields(self) -> dict[str, str]:
+        """
+        Возвращает поля модели
+
+        Возвращает:
+            dict: Словарь {название_поля: название_колонки}
+        """
         if self._records:
             return {field: field for field in self._records[0].keys()}
         else:
@@ -52,8 +80,36 @@ class BaseReport:
 
 
 class JsonReport(BaseReport):
+    """
+    Класс для генерации структурированных отчетов в JSON-формате
+
+    Наследует:
+        BaseReport
+
+    Методы:
+        create_json_report(): Формирует отчет с группировкой
+    """
 
     def create_json_report(self, *fields: str, group: str = None) -> dict:
+        """
+        Создает отчет с возможностью группировки
+
+        Параметры:
+            fields (str): Поля для включения в отчет
+            group (str): Поле для группировки
+
+        Возвращает:
+            dict: Отчет в формате:
+                {
+                    "group1": {"items": [records]},
+                    ...
+                }
+
+            Пример:
+                >>> report = JsonReport()
+                >>> report.load_from_files("data.csv")
+                >>> result = report.create_json_report("name", "hours", group="department")
+        """
         (
             self.sort_records(group, *fields)
             if group is not None
@@ -75,8 +131,20 @@ class JsonReport(BaseReport):
 
 
 class ShowReport(BaseReport):
+    """
+    Класс для форматированного вывода отчетов в консоль
+
+    Наследует:
+        BaseReport
+
+    Методы:
+        set_title_report(): Настройка заголовков
+        show_report(): Вывод отчета
+        set_symbol(): Установка символов форматирования
+    """
 
     def __init__(self) -> None:
+
         super().__init__()
         self._title: dict[str, str] = defaultdict(str)
         self._subtotal_columns = []
@@ -88,9 +156,13 @@ class ShowReport(BaseReport):
 
     def set_title_report(self, **fields) -> None:
         """
+        Задает пользовательские заголовки колонок
 
-        Args:
-            **fields (object):
+        Параметры:
+            **fields (str): Пары {поле: новый_заголовок}
+
+        Пример:
+            >>> report.set_title_report(name="Сотрудник", hours="Часы")
         """
         if not self._title:
             self._title = self.get_model_fields()
@@ -103,8 +175,19 @@ class ShowReport(BaseReport):
                 print(f"Указанная колонка `{key}` не найдена.")
 
     def show_report(
-            self, *fields: str, group: str = None, subtotal_columns: list[str] = None
+        self, *fields: str, group: str = None, subtotal_columns: list[str] = None
     ) -> None:
+        """
+        Выводит форматированный отчет в консоль
+
+        Параметры:
+        fields (str): Поля для отображения
+        group (str): Поле группировки
+        subtotal_columns (list): Колонки для промежуточных итогов
+
+        Пример:
+            >>> report.show_report("name", "hours", group="department")
+        """
         self.sort_records(group, *fields)
         self.__clear(*fields, group=group, subtotal_columns=subtotal_columns)
         for record in self._records:
@@ -134,21 +217,22 @@ class ShowReport(BaseReport):
         return title
 
     def __update_column_widths(self) -> None:
-        """Обновляет максимальные длины значений для колонок."""
+        """Рассчитывает ширину колонок"""
         for field in self.get_model_fields():
             self._max_lens[field] = max(
                 self._max_lens[field],
-                len(self._title.get(field,"")) or len(str(field)),
+                len(self._title.get(field, "")) or len(str(field)),
             )
 
         for record in self._records:
             for key, value in record.items():
                 self._max_lens[key] = max(
                     self._max_lens[key],
-                    len(str(value)) + len(self._symbol.get("key",""))
+                    len(str(value)) + len(self._symbol.get("key", "")),
                 )
 
     def __get_update_main_line(self, record: BaseRecordT, *fields: str) -> str:
+        """Формирует основную строку"""
         line = " " * self.indent
         for field in fields or self._title.keys():
             if self._title[field] == " ":
@@ -160,6 +244,7 @@ class ShowReport(BaseReport):
         return line
 
     def __get_update_group_line(self, record: BaseRecordT) -> str:
+        """Обрабатывает группы"""
         if value := record.get(self.group):
             if self._current_group != value:
                 self._current_group = value
@@ -201,5 +286,14 @@ class ShowReport(BaseReport):
         self._result = [self.__get_title(*fields)]
 
     def set_symbol(self, **symbol: str) -> None:
+        """
+        Устанавливает символы для форматирования значений
+
+        Параметры:
+            **symbols (str): Пары {поле: символ}
+
+        Пример:
+            >>> report.set_symbol(price="$", hours="ч")
+        """
         for key, value in symbol.items():
             self._symbol[key] = value

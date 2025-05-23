@@ -25,7 +25,7 @@ if __name__ == "__main__":
         hourly_rate="rate",
     )
     report.set_symbol(
-        payout= "$",
+        payout="$",
     )
     ic(
         report.show_report(
@@ -34,9 +34,7 @@ if __name__ == "__main__":
             "name",
             # # "email",
             "hours_worked",
-
             # # # #
-
             "hourly_rate",
             "payout",
             group="department",
@@ -44,7 +42,6 @@ if __name__ == "__main__":
                 "hours_worked",
                 # "hourly_rate",
                 "payout",
-
             ],
         )
     )
