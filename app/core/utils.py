@@ -1,10 +1,16 @@
 import argparse
+from dataclasses import dataclass
 
-from app.core.config import ReportEnum
-from app.core.dc import Namespace
+from app.core.setup import ReportEnum
 
 
-def arg_parser() -> Namespace:
+@dataclass
+class Namespace:
+    files: list[str]
+    report: str
+
+
+def args_parser() -> Namespace:
     parser = argparse.ArgumentParser(description="Обработка данных и генерация отчета")
     parser.add_argument(
         "files",
