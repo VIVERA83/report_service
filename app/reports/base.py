@@ -32,7 +32,6 @@ class BaseReport:
 
     def __init__(self) -> None:
         self.model = self.Meta.model
-        ic(self.model)
         self._records: list[BaseRecord] = []
 
         self._max_lens: dict[str, int] = defaultdict(int)
