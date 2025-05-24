@@ -1,11 +1,12 @@
-import pytest
-from io import StringIO
 import sys
+from io import StringIO
 
-from app.report.dc import Record
-from app.report.payout import Payout
+import pytest
+
 from app.core.config import ReportEnum
 from app.core.dc import Namespace
+from app.report.dc import Record
+from app.report.payout import Payout
 
 
 def test_record_creation(sample_records):

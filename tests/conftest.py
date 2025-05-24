@@ -1,6 +1,7 @@
 import os.path
 import sys
 from pathlib import Path
+
 import pytest
 
 from app.report.dc import Record

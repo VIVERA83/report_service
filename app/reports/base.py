@@ -1,6 +1,8 @@
 from collections import defaultdict
 from typing import Type
 
+from icecream import ic
+
 from app.models.base import BaseRecord
 from app.models.utils import custom_sort
 from app.reports.types import BaseRecordT
@@ -26,10 +28,11 @@ class BaseReport:
     """
 
     class Meta:
-        model: Type[BaseRecord] = BaseRecord
+        model: Type[BaseRecord] #= BaseRecord
 
     def __init__(self) -> None:
         self.model = self.Meta.model
+        ic(self.model)
         self._records: list[BaseRecord] = []
 
         self._max_lens: dict[str, int] = defaultdict(int)
@@ -144,7 +147,6 @@ class ShowReport(BaseReport):
     """
 
     def __init__(self) -> None:
-
         super().__init__()
         self._title: dict[str, str] = defaultdict(str)
         self._subtotal_columns = []
@@ -188,6 +190,7 @@ class ShowReport(BaseReport):
         Пример:
             >>> report.show_report("name", "hours", group="department")
         """
+        ic(self.Meta.model)
         self.sort_records(group, *fields)
         self.__clear(*fields, group=group, subtotal_columns=subtotal_columns)
         for record in self._records:

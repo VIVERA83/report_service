@@ -1,5 +1,7 @@
 from typing import Generator, Type
 
+from icecream import ic
+
 from app.reports.types import BaseRecordT
 
 
