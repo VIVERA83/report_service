@@ -1,6 +1,6 @@
 from typing import Generator, Type
 
-from app.reports.types import BaseRecordT
+from reports.types import BaseRecordT
 
 
 def file_parse(
