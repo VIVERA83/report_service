@@ -1,12 +1,10 @@
 from typing import Generator, Type
 
-from icecream import ic
-
 from app.reports.types import BaseRecordT
 
 
 def file_parse(
-    file_name: str, cls: Type[BaseRecordT]
+        file_name: str, cls: Type[BaseRecordT]
 ) -> Generator[BaseRecordT, None, None]:
     """
     Парсит CSV-файл и возвращает генератор объектов указанного класса
