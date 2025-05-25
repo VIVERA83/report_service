@@ -1,10 +1,10 @@
 from collections import defaultdict
 from typing import Type
 
-from app.models.base import BaseRecord
-from app.models.utils import custom_sort
-from app.reports.types import BaseRecordT
-from app.reports.utils import file_parse
+from models.base import BaseRecord
+from models.utils import custom_sort
+from reports.types import BaseRecordT
+from reports.utils import file_parse
 
 
 class BaseReport:
@@ -26,7 +26,7 @@ class BaseReport:
     """
 
     class Meta:
-        model: Type[BaseRecord]  # = BaseRecord
+        model: Type[BaseRecord]  = BaseRecord
 
     def __init__(self) -> None:
         self.model = self.Meta.model
@@ -106,9 +106,9 @@ class JsonReport(BaseReport):
                 }
 
             Пример:
-                >>> report = JsonReport()
-                >>> report.load_from_files("data.csv")
-                >>> result = report.create_json_report("name", "hours", group="department")
+                report = JsonReport()
+                report.load_from_files("data.csv")
+                result = report.create_json_report("name", "hours", group="department")
         """
         (
             self.sort_records(group, *fields)
@@ -161,7 +161,7 @@ class ShowReport(BaseReport):
             **fields (str): Пары {поле: новый_заголовок}
 
         Пример:
-            >>> report.set_title_report(name="Сотрудник", hours="Часы")
+            report.set_title_report(name="Сотрудник", hours="Часы")
         """
         if not self._title:
             self._title = self.get_model_fields()
@@ -185,9 +185,8 @@ class ShowReport(BaseReport):
         subtotal_columns (list): Колонки для промежуточных итогов
 
         Пример:
-            >>> report.show_report("name", "hours", group="department")
+            report.show_report("name", "hours", group="department")
         """
-        self.Meta.model
         self.sort_records(group, *fields)
         self.__clear(*fields, group=group, subtotal_columns=subtotal_columns)
         for record in self._records:
@@ -293,7 +292,7 @@ class ShowReport(BaseReport):
             **symbols (str): Пары {поле: символ}
 
         Пример:
-            >>> report.set_symbol(price="$", hours="ч")
+            report.set_symbol(price="$", hours="ч")
         """
         for key, value in symbol.items():
             self._symbol[key] = value
