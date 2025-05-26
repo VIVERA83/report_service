@@ -1,7 +1,7 @@
 import pytest
 
-from app.models.models import Record
-from app.reports.base import JsonReport
+from core.record import Record
+from data_reporter.report.json import JsonReport
 
 
 @pytest.fixture

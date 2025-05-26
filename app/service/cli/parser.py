@@ -10,7 +10,7 @@ class CLINamespace:
     report: str
 
 
-def create_parser():
+def create_parser() -> CLINamespace:
     parser = argparse.ArgumentParser(description="Обработка данных и генерация отчета")
     parser.add_argument(
         "files",
@@ -23,4 +23,5 @@ def create_parser():
         choices=ReportEnum.to_list(),  # Допустимые значения
         help="Тип генерируемого отчета",
     )
-    return parser
+    args = parser.parse_args()
+    return CLINamespace(files=args.files, report=args.report)

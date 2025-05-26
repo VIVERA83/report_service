@@ -1,6 +1,7 @@
 import pytest
-from app.models.models import Record
-from app.models.utils import resolve_aliases
+
+from core.decorators import resolve_aliases
+from core.record import Record
 
 
 @pytest.fixture

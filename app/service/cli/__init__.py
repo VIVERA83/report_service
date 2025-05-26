@@ -1,5 +1,3 @@
-from icecream import ic
-
 from .parser import create_parser
 from .commands import CLIHandler
 
@@ -15,6 +13,5 @@ class CLIRouter:
         if command:
             result= command(args.files)
             print(result)
-            ic(result)
         else:
             print("Unknown command")

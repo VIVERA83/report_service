@@ -1,9 +1,10 @@
 import pytest
 
-from app.reports.base import BaseReport
-from app.models.base import BaseRecord
-from app.models.models import Record
+
 import tempfile
+
+from core.record import Record
+from data_reporter.report.base import BaseReport
 
 
 @pytest.fixture

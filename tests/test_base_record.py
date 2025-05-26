@@ -1,4 +1,4 @@
-from app.models.base import BaseRecord
+from data_reporter.record.base import BaseRecord
 
 
 def test_sum_calculation():
