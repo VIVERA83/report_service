@@ -1,4 +1,4 @@
-from app.models.utils import is_float_number
+from data_reporter.record.utils import is_float_number
 
 
 class BaseRecord(dict):

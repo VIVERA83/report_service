@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from app.core.reports.base import BaseReport
+from data_reporter.report.base import BaseReport
 
 
 class JsonReport(BaseReport):
@@ -30,9 +30,9 @@ class JsonReport(BaseReport):
                 }
 
             Пример:
-                >>> report = JsonReport()
-                >>> report.load_from_files("data.csv")
-                >>> result = report.create_json_report("name", "hours", group="department")
+                report = JsonReport()
+                report.load_from_files("data.csv")
+                result = report.create_json_report("name", "hours", group="department")
         """
         (
             self.sort_records(group, *fields)

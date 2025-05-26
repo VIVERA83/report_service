@@ -1,6 +1,7 @@
 from collections import defaultdict
 
-from app.core.reports.base import BaseReport, BaseRecordT
+from data_reporter.record.base import BaseRecord
+from data_reporter.report.base import BaseReport
 
 
 class ShowReport(BaseReport):
@@ -103,7 +104,7 @@ class ShowReport(BaseReport):
                     len(str(value)) + len(self._symbol.get("key", "")),
                 )
 
-    def __get_update_main_line(self, record: BaseRecordT, *fields: str) -> str:
+    def __get_update_main_line(self, record: BaseRecord, *fields: str) -> str:
         """Формирует основную строку"""
         line = " " * self.indent
         for field in fields or self._title.keys():
@@ -115,7 +116,7 @@ class ShowReport(BaseReport):
             line += " " * self.indent
         return line
 
-    def __get_update_group_line(self, record: BaseRecordT) -> str:
+    def __get_update_group_line(self, record: BaseRecord) -> str:
         """Обрабатывает группы"""
         if value := record.get(self.group):
             if self._current_group != value:
@@ -141,7 +142,7 @@ class ShowReport(BaseReport):
         self._is_new_group = False
         return ""
 
-    def __update_subtotal(self, record: BaseRecordT):
+    def __update_subtotal(self, record: BaseRecord):
         for key, value in record.items():
             if key in self._subtotal_columns:
                 if not self._subtotal.get(self._current_group):

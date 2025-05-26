@@ -1,14 +1,8 @@
 from collections import defaultdict
-from typing import Type, TypeVar
+from typing import Type, Generator
 
-from icecream import ic
-
-from app.models.base import BaseRecord
-from app.models.utils import custom_sort
-from app.reports.types import BaseRecordT
-from app.reports.utils import file_parse
-
-BaseRecordT = TypeVar("BaseRecordT", bound=BaseRecord)
+from data_reporter.record.base import BaseRecord
+from data_reporter.report.utils import custom_sort
 
 
 class BaseReport:
@@ -30,7 +24,7 @@ class BaseReport:
     """
 
     class Meta:
-        model: Type[BaseRecord] #= BaseRecord
+        model: Type[BaseRecord] = BaseRecord
 
     def __init__(self) -> None:
         self.model = self.Meta.model
@@ -53,7 +47,7 @@ class BaseReport:
             >>> report.load_from_files("data.csv")
         """
         for file in files:
-            self._records.extend(file_parse(file, self.model))
+            self._records.extend(self._file_parse(file))
 
     def sort_records(self, *fields: str, reverse=False) -> None:
         """
@@ -82,5 +76,21 @@ class BaseReport:
         else:
             return {}
 
+    def _file_parse(
+            self, file_name: str,
+    ) -> Generator[BaseRecord, None, None]:
+        """
+        Парсит CSV-файл и возвращает генератор объектов указанного класса
 
+        Args:
+            file_name: Путь к CSV-файлу
 
+        Yields:
+            Экземпляры класса cls с данными из файла
+        """
+        with open(file_name, "r", encoding="utf-8") as f:
+            keys = f.readline().strip().split(",")
+            for line in f:
+                values = line.strip().split(",")
+                record_data = {key: value for key, value in zip(keys, values)}
+                yield self.model(**record_data)
