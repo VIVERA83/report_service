@@ -10,7 +10,7 @@ class CLINamespace:
     report: str
 
 
-def create_parser() -> CLINamespace:
+def create_name_space() -> CLINamespace:
     parser = argparse.ArgumentParser(description="Обработка данных и генерация отчета")
     parser.add_argument(
         "files",
