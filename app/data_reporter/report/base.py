@@ -77,7 +77,8 @@ class BaseReport:
             return {}
 
     def _file_parse(
-            self, file_name: str,
+        self,
+        file_name: str,
     ) -> Generator[BaseRecord, None, None]:
         """
         Парсит CSV-файл и возвращает генератор объектов указанного класса

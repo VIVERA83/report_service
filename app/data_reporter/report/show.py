@@ -48,7 +48,7 @@ class ShowReport(BaseReport):
                 print(f"Указанная колонка `{key}` не найдена.")
 
     def show_report(
-            self, *fields: str, group: str = None, subtotal_columns: list[str] = None
+        self, *fields: str, group: str = None, subtotal_columns: list[str] = None
     ) -> None:
         """
         Выводит форматированный отчет в консоль
