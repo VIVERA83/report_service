@@ -92,6 +92,7 @@ console_report.set_title_report(
 console_report.set_symbol(payout="Р")
 console_report.show_report("name", "hours_worked", "hourly_rate", "payout", group="department")
 ```
-Пример вывода
+### Пример вывода
+
 ![img.png](img.png)
 
