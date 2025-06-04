@@ -1,6 +1,7 @@
 import pytest
-from app.models.models import Record
-from app.models.utils import resolve_aliases
+
+from core.decorators import resolve_aliases
+from core.record import Record
 
 
 @pytest.fixture
@@ -11,7 +12,7 @@ def sample_record():
         email="john@example.com",
         department="IT",
         hours_worked=160,
-        rate=1500  # Используем алиас
+        rate=1500,  # Используем алиас
     )
 
 
@@ -30,5 +31,9 @@ def test_aliases_handling():
 
 
 def test_post_init_calculation():
-    record = Record(hours_worked=120, salary=2000, **{k: "" for k in ["id", "name", "email", "department"]})
+    record = Record(
+        hours_worked=120,
+        salary=2000,
+        **{k: "" for k in ["id", "name", "email", "department"]}
+    )
     assert record["payout"] == 120 * 2000

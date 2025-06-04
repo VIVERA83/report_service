@@ -1,9 +1,10 @@
 import pytest
 
-from app.reports.base import BaseReport
-from app.models.base import BaseRecord
-from app.models.models import Record
+
 import tempfile
+
+from core.record import Record
+from data_reporter.report.base import BaseReport
 
 
 @pytest.fixture
@@ -16,7 +17,7 @@ def base_report():
 
 
 def test_load_from_files(base_report):
-    with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         f.write("id,name,email,department,hours_worked,rate\n")
         f.write("001,John,john@test.com,IT,160,1500")
 
@@ -28,7 +29,7 @@ def test_load_from_files(base_report):
 def test_sort_records(base_report):
     records = [
         Record(name="Bob", department="HR", hours_worked=100, hourly_rate=60),
-        Record(name="Alice", department="IT", hours_worked=10, hourly_rate=60)
+        Record(name="Alice", department="IT", hours_worked=10, hourly_rate=60),
     ]
 
     base_report._records = records

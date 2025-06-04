@@ -1,11 +1,12 @@
-from app.models.models import Record
-from app.reports.base import ShowReport, JsonReport
-
+from core.record import Record
+from data_reporter.report.json import JsonReport
+from data_reporter.report.show import ShowReport
 
 
 class ShowPayoutReport(ShowReport):
     class Meta:
         model = Record
+
 
 class JsonPayoutReport(JsonReport):
     class Meta:

@@ -1,7 +1,7 @@
 import pytest
 
-from app.reports.base import ShowReport
-from app.models.models import Record
+from core.record import Record
+from data_reporter.report.show import ShowReport
 
 
 @pytest.fixture

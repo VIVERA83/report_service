@@ -1,5 +1,4 @@
 from functools import wraps
-from typing import Any, Callable
 
 
 def resolve_aliases(aliases=None):
@@ -26,20 +25,3 @@ def resolve_aliases(aliases=None):
         return cls
 
     return decorator
-
-
-def custom_sort(*fields: str) -> Callable[[tuple[str, Any]], int]:
-    """Генерирует функцию для кастомный сортировки."""
-
-    def inner(key) -> int:
-        try:
-            return fields.index(key)
-        except ValueError:
-            return len(fields)
-
-    return lambda el: inner(el[0])
-
-
-def is_float_number(number: int | float) -> bool:
-    integer = int(number)
-    return (integer / 2) * 2 != number

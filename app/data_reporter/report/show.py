@@ -1,133 +1,7 @@
 from collections import defaultdict
-from typing import Type
 
-from models.base import BaseRecord
-from models.utils import custom_sort
-from reports.types import BaseRecordT
-from reports.utils import file_parse
-
-
-class BaseReport:
-    """
-    Базовый класс для генерации отчетов
-
-    Attributes:
-        model (Type[BaseRecord]): Класс модели данных
-        _records (list[BaseRecord]): Загруженные записи
-        _max_lens (dict[str, int]): Максимальные длины значений колонок
-        indent (int): Размер отступа между колонками
-        _subtotal_columns (list): Колонки для промежуточных итогов
-        group (str): Поле для группировки данных
-
-    Методы:
-        load_from_files(): Загрузка данных из файлов
-        sort_records(): Сортировка записей
-        get_model_fields(): Получение полей модели
-    """
-
-    class Meta:
-        model: Type[BaseRecord]  = BaseRecord
-
-    def __init__(self) -> None:
-        self.model = self.Meta.model
-        self._records: list[BaseRecord] = []
-
-        self._max_lens: dict[str, int] = defaultdict(int)
-        self.indent = 3
-        self._subtotal_columns = []
-        self.group = ""
-
-    def load_from_files(self, *files: str) -> None:
-        """
-        Загружает данные из файлов
-
-        Параметры:
-            files (str): Список путей к файлам
-
-        Пример:
-            >>> report = BaseReport()
-            >>> report.load_from_files("data.csv")
-        """
-        for file in files:
-            self._records.extend(file_parse(file, self.model))
-
-    def sort_records(self, *fields: str, reverse=False) -> None:
-        """
-        Сортирует записи по указанным полям
-
-        Параметры:
-            fields (str): Поля для сортировки
-            reverse (bool): Обратный порядок сортировки
-        """
-        for record in self._records:
-            record.sort(by="custom", key_func=custom_sort(*fields), reverse=reverse)
-        self._records.sort(
-            key=lambda rec: [rec[key] for key in rec.keys() if key in fields],
-            reverse=reverse,
-        )
-
-    def get_model_fields(self) -> dict[str, str]:
-        """
-        Возвращает поля модели
-
-        Возвращает:
-            dict: Словарь {название_поля: название_колонки}
-        """
-        if self._records:
-            return {field: field for field in self._records[0].keys()}
-        else:
-            return {}
-
-
-class JsonReport(BaseReport):
-    """
-    Класс для генерации структурированных отчетов в JSON-формате
-
-    Наследует:
-        BaseReport
-
-    Методы:
-        create_json_report(): Формирует отчет с группировкой
-    """
-
-    def create_json_report(self, *fields: str, group: str = None) -> dict:
-        """
-        Создает отчет с возможностью группировки
-
-        Параметры:
-            fields (str): Поля для включения в отчет
-            group (str): Поле для группировки
-
-        Возвращает:
-            dict: Отчет в формате:
-                {
-                    "group1": {"items": [records]},
-                    ...
-                }
-
-            Пример:
-                report = JsonReport()
-                report.load_from_files("data.csv")
-                result = report.create_json_report("name", "hours", group="department")
-        """
-        (
-            self.sort_records(group, *fields)
-            if group is not None
-            else self.sort_records(*fields)
-        )
-        fields = fields or self.get_model_fields()
-        result = defaultdict(dict)
-        for report in self._records:
-            if data := {key: value for key, value in report.items() if key in fields}:
-                if group:
-                    arr = result.get(report[group], {"items": []})
-                    arr["items"].append(data)
-                    result[report[group]] = arr
-                else:
-                    arr = result.get("items", [])
-                    arr.append(data)
-                    result["items"] = arr
-        return result
+from data_reporter.record.base import BaseRecord
+from data_reporter.report.base import BaseReport
 
 
 class ShowReport(BaseReport):
@@ -230,7 +104,7 @@ class ShowReport(BaseReport):
                     len(str(value)) + len(self._symbol.get("key", "")),
                 )
 
-    def __get_update_main_line(self, record: BaseRecordT, *fields: str) -> str:
+    def __get_update_main_line(self, record: BaseRecord, *fields: str) -> str:
         """Формирует основную строку"""
         line = " " * self.indent
         for field in fields or self._title.keys():
@@ -242,7 +116,7 @@ class ShowReport(BaseReport):
             line += " " * self.indent
         return line
 
-    def __get_update_group_line(self, record: BaseRecordT) -> str:
+    def __get_update_group_line(self, record: BaseRecord) -> str:
         """Обрабатывает группы"""
         if value := record.get(self.group):
             if self._current_group != value:
@@ -268,7 +142,7 @@ class ShowReport(BaseReport):
         self._is_new_group = False
         return ""
 
-    def __update_subtotal(self, record: BaseRecordT):
+    def __update_subtotal(self, record: BaseRecord):
         for key, value in record.items():
             if key in self._subtotal_columns:
                 if not self._subtotal.get(self._current_group):

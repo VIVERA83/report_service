@@ -1,20 +1,20 @@
-import argparse
 from dataclasses import dataclass
+import argparse
 
-from app.core.setup import ReportEnum
+from service.cli.commands import ReportEnum
 
 
 @dataclass
-class Namespace:
+class CLINamespace:
     files: list[str]
     report: str
 
 
-def args_parser() -> Namespace:
+def create_name_space() -> CLINamespace:
     parser = argparse.ArgumentParser(description="Обработка данных и генерация отчета")
     parser.add_argument(
         "files",
-        nargs="+",  # Принимаем один или несколько файлов
+        nargs="+",
         help="Список CSV-файлов для обработки",
     )
     parser.add_argument(
@@ -23,7 +23,5 @@ def args_parser() -> Namespace:
         choices=ReportEnum.to_list(),  # Допустимые значения
         help="Тип генерируемого отчета",
     )
-
     args = parser.parse_args()
-
-    return Namespace(files=args.files, report=args.report)
+    return CLINamespace(files=args.files, report=args.report)

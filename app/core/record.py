@@ -1,5 +1,5 @@
-from models.base import BaseRecord
-from models.utils import resolve_aliases
+from core.decorators import resolve_aliases
+from data_reporter.record.base import BaseRecord
 
 HOURLY_RATE = ["hourly_rate", "rate", "salary"]
 
