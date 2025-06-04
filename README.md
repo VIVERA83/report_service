@@ -26,8 +26,17 @@
 ```bash
 pip install -r requirements.txt
 ```
+### Пример запуска
+1:
+```bash
+python app/main.py --report payout data/data1.csv
+```
 
-### Пример использования
+2:
+```bash
+python app/main.py --report payout data/data1.csv data/data2.csv data/data3.csv
+```
+### Пример использования отдельных модулей
 
 ```python
 from data_reporter.report.json import JsonReport

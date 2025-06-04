@@ -1,5 +1,5 @@
-from .parser import create_name_space
 from .commands import CLIHandler
+from .parser import create_name_space
 
 
 class CLIRouter:
@@ -10,7 +10,8 @@ class CLIRouter:
     def run(self):
         command = self.handler.commands.get(self.name_space.report)
         if command:
-            result= command(self.name_space.files)
-            print(result)
+            result = command(self.name_space.files)
+            if result:
+                print(result)
         else:
             print("Unknown command")
